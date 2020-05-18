@@ -1,10 +1,10 @@
 import queue
 import wikipedia
 import text_utilities
-import Writer
+import writer
 
 
-TOTAL_NUM_SENTENCES = 1000
+TOTAL_NUM_SENTENCES = 100
 NUM_CLUSTERS = 10
 SENTENCES_PER_ARTICLE_PERCENTAGE = 20 / 100
 NUM_SENTENCES_PER_CLUSTER = TOTAL_NUM_SENTENCES / NUM_CLUSTERS
@@ -16,10 +16,15 @@ EXPANSION_RATE = NUM_CLUSTERS  # the number of articles to expand to from 1 arti
 def get_wiki_page(article_name):
     try:
         wiki_page = wikipedia.page(title=article_name)
+        return wiki_page
     except wikipedia.exceptions.DisambiguationError as err:
         # always take the first option
-        wiki_page = err.options[0]
-    finally:
+        wiki_title = err.options[0]
+        print(wiki_title)
+        wiki_page = wikipedia.page(wiki_title)
+        return wiki_page
+    except wikipedia.exceptions.PageError:
+        wiki_page = get_wiki_page(wikipedia.random())
         return wiki_page
 
 
@@ -49,9 +54,9 @@ def produce_sentences_batch(first_article_title):
     while count < NUM_SENTENCES_PER_CLUSTER:
         curr_article_title = articles_queue.get()
         children = get_more_articles(curr_article_title)
-        map(articles_queue.put, children)
+        list(map(articles_queue.put, children))
         mini_batch = process_one_article(curr_article_title)
-        batch.append(mini_batch)
+        batch.extend(mini_batch)
         count += len(mini_batch)
     return batch
 
@@ -63,10 +68,12 @@ def scrape_wiki(lang):
     # TODO: support NUM_CLUSTERS > 10
     seeds = wikipedia.random(NUM_CLUSTERS)
     for i in range(len(seeds)):
+        # TODO: add debug mode
+        print("STATUS: starting with {}".format(seeds[i]))
         text_lines = produce_sentences_batch(seeds[i])
-        filename = Writer.create_filename(i)
-        Writer.write_all_textlines_to_file(text_lines, filename)
+        filename = writer.create_filename(i)
+        writer.write_all_textlines_to_file(text_lines, filename)
         print("STATUS: finished creating {}".format(filename))
 
 
-scrape_wiki("he")
+# scrape_wiki("he")

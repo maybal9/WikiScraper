@@ -1,7 +1,7 @@
 import random
 
 
-TOTAL_NUM_SENTENCES = 1000
+TOTAL_NUM_SENTENCES = 100
 NUM_CLUSTERS = 10
 SENTENCES_PER_ARTICLE_PERCENTAGE = 20 / 100
 NUM_SENTENCES_PER_CLUSTER = TOTAL_NUM_SENTENCES / NUM_CLUSTERS
@@ -22,10 +22,9 @@ def get_random_elements_from_list(arg_list, num):
 # converts a text to a list of sentences
 def extract_all_sentences(article_content):
     all_sentences = []
-    for line in article_content:
-        sentences = line.split(". ")
-        sentences = list(filter(lambda sent: sent != "\n", sentences))
-        map(lambda sent: all_sentences.append(sent+"\n"), sentences)
+    sentences = article_content.split(". ")
+    sentences = list(filter(lambda sent: sent != "\n", sentences))
+    list(map(lambda sent: all_sentences.append(sent+"\n"), sentences))
     return all_sentences
 
 
