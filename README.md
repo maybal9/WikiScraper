@@ -1,2 +1,2 @@
 # WikiScraper
-given a term, search it in wikipedia internal links.
+a simple wiki scraper, extracts sentences from random wiki articles, in English 
